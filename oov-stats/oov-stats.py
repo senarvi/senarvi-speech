@@ -23,6 +23,8 @@ import sys
 import io
 
 parser = OptionParser()
+parser.add_option('--limit',
+                  action='store', type='int', dest='limit', default=None)
 (options, args) = parser.parse_args()
 
 if len(args) != 1:
@@ -55,3 +57,5 @@ for line in io.TextIOWrapper(sys.stdin.buffer, 'utf-8'):
 			oov_rate = float(num_oov_words) / num_test_words
 			sys.stdout.write("%i, %i, %i, %f\n" % (word_count, len(vocabulary), num_oov_words, oov_rate))
 			sys.stderr.write("word_count=%i, vocabulary=%i, num_oov_words=%i, oov_rate=%f\n" % (word_count, len(vocabulary), num_oov_words, oov_rate))
+		if word_count > options.limit:
+			sys.exit(0)
