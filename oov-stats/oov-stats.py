@@ -1,22 +1,7 @@
 #!/usr/bin/env python3
 #
-# Reads a pronunciation dictionary and an errors file. There is one line per
-# word pronunciation in the errors file. Each line begins with the word name,
-# including optional pronunciation ID. Followed by the word name is one entry
-# per training utterance that gives information about the word errors in the
-# utterance. The format is:
-#
-#   WORD[:N] WORDS1:ORIGERR1:ERR1 WORDS2:ORIGERR2:ERR2 ...
-#
-# :N indicates Nth pronunciation variant, and is only given for words with
-# multiple pronunciation variants. WORDSi is the number of words in the
-# ith utterance. ORIGERRi is the number of word errors in the best path of the
-# original pronunciation lattice. ERRi is the number of word errors in the best
-# path of the pronunciation lattice without WORD:N.
-#
-# This script converts the word errors into pronunciation probabilities
-# (avg_err_inc or avg_wer_inc algorithm), or removes words that cause more
-# errors (err_dec or wer_dec algorithm), and writes a new dictionary.
+# Reads a vocabulary and a corpus. While reading the corpus, periodically
+# outputs statistics of vocabulary size and OOV rate. 
 
 from optparse import OptionParser
 import sys
