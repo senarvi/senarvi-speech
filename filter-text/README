@@ -20,7 +20,7 @@ based on the scores that were written in perplexity.scores. At the
 same time, bigram language model perplexity on devel2.txt can be
 computed periodically:
 
-  sort-pages.py --ascending --devel-text=devel2.txt --order=2 --statistics=stats.csv perplexity.scores
+  sort-pages.py --devel-text=devel2.txt --order=2 --statistics=stats.csv perplexity.scores
 
 Notice that devel2.txt should be different from the development text
 used to score the text pages in the first place (if any). Finally,
