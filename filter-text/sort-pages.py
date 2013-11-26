@@ -105,8 +105,8 @@ if (args.devel_text is not None) and (args.statistics is not None):
 					train_text.seek(0, 2)
 				else:
 					perplexity, num_oovs = word_perplexity(train_text.name, args.devel_text, args.vocab)
-				stats_file.write("%i, %f, %f, %i\n" % (page_count, score, perplexity, num_oovs))
-				stats_file.flush()
+				args.statistics.write("%i, %f, %f, %i\n" % (page_count, score, perplexity, num_oovs))
+				args.statistics.flush()
 				sys.stderr.write("page_count=%i, score=%f, perplexity=%f, num_oovs=%i\n" % (page_count, score, perplexity, num_oovs))
 			except subprocess.CalledProcessError as e:
 				# Currently perplexity computation may fail if there are no
