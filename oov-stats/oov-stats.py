@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 #
 # Reads a vocabulary and a corpus. While reading the corpus, periodically
 # outputs statistics of vocabulary size and OOV rate. 
+#
+# Author: Seppo Enarvi
+# http://users.marjaniemi.com/seppo/
 
-from optparse import OptionParser
+import argparse
 import sys
 import io
+from filetypes import TextFileType
 
 def print_stats(counts, word_limit):
 	num_test_words = sum(counts.values())
@@ -29,25 +34,21 @@ def print_stats(counts, word_limit):
 			if word_count > word_limit:
 				return
 
-parser = OptionParser()
-parser.add_option('--limit',
-                  action='store', type='int', dest='limit', default=None)
-(options, args) = parser.parse_args()
-
-if len(args) != 1:
-	print >>sys.stderr, "Expecting path to test data."
-	sys.exit(2)
+parser = argparse.ArgumentParser()
+parser.add_argument('text', type=TextFileType('r'), help='input text file')
+parser.add_argument('--limit', type=int, default=None)
+args = parser.parse_args()
 
 counts = {}
-with open(args[0], 'r', encoding='utf-8') as f:
-	for line in f:
-		for word in line.split():
-			if not word in counts:
-				counts[word] = 1
-			else:
-				counts[word] += 1
+for line in args.text:
+	for word in line.split():
+		if not word in counts:
+			counts[word] = 1
+		else:
+			counts[word] += 1
+args.text.close()
 
-print_stats(counts, options.limit)
+print_stats(counts, args.limit)
 
 sorted_counts = sorted(counts, key=counts.get)
 sys.stderr.write("Most frequent unseen words:\n")
