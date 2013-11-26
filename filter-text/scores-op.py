@@ -39,7 +39,6 @@ if len(args.input) == 1:
 	for uri, score in scores.items():
 		result = method(score)
 		args.output.write("###### %s\n%f\n" % (uri, result))
-		args.output.write("%f\n" % score)
 elif len(args.input) == 2:
 	scores1 = read_scores(args.input[0])
 	scores2 = read_scores(args.input[1])
@@ -47,7 +46,6 @@ elif len(args.input) == 2:
 		score2 = scores2[uri]
 		result = method(score1, score2)
 		args.output.write("###### %s\n%f\n" % (uri, result))
-		args.output.write("%f, %f\n" % (score1, score2))
 else:
 	sys.stderr.write("Expecting at most two score files.\n")
 	sys.exit(2)
