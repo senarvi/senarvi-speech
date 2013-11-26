@@ -23,9 +23,14 @@ computed periodically:
   sort-pages.py --devel-text=devel2.txt --order=2 --statistics=stats.csv perplexity.scores
 
 Notice that devel2.txt should be different from the development text
-used to score the text pages in the first place (if any). Finally,
-stats.csv can be inspected to find the point of minimum perplexity,
-and the score (say 65) can be used as the filtering threshold:
+used to score the text pages in the first place (if any). Now you can
+inspect stats.csv in order to find the point of minimum perplexity,
+e.g:
+
+  sort -n -k3 -t, stats.csv | head
+
+Say the minimum perplexity is obtained at score 65. This can be used
+as the filtering threshold:
 
   filter-pages.py --max-score=65 --pages=input.pages --output=filtered.txt perplexity.scores
 
