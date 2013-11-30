@@ -107,7 +107,7 @@ else:
 		try:
 			score = float(score_str)
 		except ValueError:
-			sys.stderr.write("Invalid score '%s' for page %s." % (score_str, uri))
+			sys.stderr.write("Invalid score '%s' for page %s.\n" % (score_str, uri))
 			sys.exit(3)
 		scores_file.write("###### %s\n%f\n" % (uri, score))
 		scores_file.flush()
