@@ -103,7 +103,12 @@ else:
 				write_matching_content(input_file, output_file, uri, args.merge_fragments, include_match)
 		output_file.close()
 		process.stdin.close()
-		score = float(process.stdout.readline())
+		score_str = process.stdout.readline()
+		try:
+			score = float(score_str)
+		except ValueError:
+			sys.stderr.write("Invalid score '%s' for page %s." % (score_str, uri))
+			sys.exit(3)
 		scores_file.write("###### %s\n%f\n" % (uri, score))
 		scores_file.flush()
 
