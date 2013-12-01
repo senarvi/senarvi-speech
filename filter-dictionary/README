@@ -1,0 +1,31 @@
+Scripts for pruning a pronunciation dictionary by recalculating
+recognition results using modified pronunciation lattices.
+
+In case the dictionary contains several pronunciations for some
+words, one probably wants to work with pronunciations instead of
+words. This is most easily done by first converting pronunciations
+to individual words by adding a suffix to word names.
+word-to-pronunciations.py and pronunciations-to-words.py convert
+between a regular pronunciation dictionary and one where all the
+pronunciations are individual words, identified with the original
+word name, a colon, and a running number.
+
+After obtaining the recognition lattices, one iteration (where one
+word is removed) would consists of the following steps:
+
+1. decode-reduced-lattice.py called on each recognition lattice,
+   passing the list of words to exclude from the previous iteration
+   as the --exclude parameter, and "--exclude-individually !". The
+   result is "reduction files" that contain the recognition
+   hypotheses for reduced lattices.
+
+2. score-reductions.py called on each reduction file to generate
+   "reduction score files" that contain the recognition scores for
+   reduced lattices.
+
+3. combine-errors.py, passing the root directory where the
+   generated reduction score files are. This will create an "errors
+   file" with the total errors for each word.
+
+4. worst-scoring-word.py to find the word to be excluded in further
+   iterations, given the errors file.
