@@ -29,3 +29,6 @@ word is removed) would consists of the following steps:
 
 4. worst-scoring-word.py to find the word to be excluded in further
    iterations, given the errors file.
+
+Author: Seppo Enarvi
+http://users.marjaniemi.com/seppo/
