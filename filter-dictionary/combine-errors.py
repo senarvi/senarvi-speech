@@ -7,7 +7,7 @@
 # one-word-out transcriptions in the subsequent lines (preceded by the word that
 # was omitted).
 
-from optparse import OptionParser
+import argparse
 import os
 import sys
 import subprocess
@@ -47,16 +47,13 @@ def update_errors(red_path, utterance_id, word_errors):
 		else:
 			word_errors[word] = [result]
 
-parser = OptionParser()
-(options, args) = parser.parse_args()
-
-if len(args) != 1:
-	sys.stderr.write("Expecting path to the root directory of reduction score files.\n")
-	sys.exit(2)
+parser = argparse.ArgumentParser()
+parser.add_argument('rootdir', type=str, help='path to the root directory of reduction score files')
+args = parser.parse_args()
 
 word_errors = {}
 
-for dir, subdirs, files in os.walk(args[0]):
+for dir, subdirs, files in os.walk(args.rootdir):
 	for file_name in files:
 		utterance_id, extension = os.path.splitext(file_name)
 		if extension == '.redsc':
