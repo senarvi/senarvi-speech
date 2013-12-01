@@ -25,7 +25,8 @@ word is removed) would consists of the following steps:
 
 3. combine-errors.py, passing the root directory where the
    generated reduction score files are. This will create an "errors
-   file" with the total errors for each word.
+   file" with all the statistics for each word combined into one
+   line.
 
 4. worst-scoring-word.py to find the word to be excluded in further
    iterations, given the errors file.
