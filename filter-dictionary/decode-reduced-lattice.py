@@ -3,7 +3,8 @@
 #
 # Syntax: decode-reduced-lattice.py [lattice] [--exclude word1 word2 ...] [--exclude-individually word1 word2 ...]
 #
-# Evaluates a word lattice after removing a number of words from it.
+# Evaluates a word lattice using lattice-tool after removing a number of words
+# from it.
 #
 # First removes all the words given with --exclude command line argument from the
 # lattice. Decodes the lattice using lattice-tool, and writes the result on the
@@ -25,16 +26,14 @@ from wordlattice import WordLattice
 from filetypes import TextFileType
 
 def decode_lattice(lattice):
-	script_dir = os.path.dirname(os.path.realpath(__file__))
-	executable = os.path.join(script_dir, 'decode-lattice.sh')
-
 	if lattice.end_node == -1:
 		return ""
 
 	slf_file = tempfile.NamedTemporaryFile(mode='w+', encoding='utf-8')
 	lattice.write_slf(slf_file)
 	slf_file.flush()
-	command = [executable, slf_file.name]
+
+	command = ['lattice-tool', '-in-lattice', slf_file.name, '-read-htk', '-viterbi-decode']
 	proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	output, errors = proc.communicate()
 	output = output.decode('utf-8')
@@ -46,7 +45,11 @@ def decode_lattice(lattice):
 			continue
 		# The end node was unreachable.
 		return ""
-	return output.rstrip()
+
+	result_pos = output.index(' ') + 1
+	result = output[result_pos:]
+	result = result.rstrip()
+	return result
 
 parser = argparse.ArgumentParser()
 parser.add_argument('lattice', type=TextFileType('r'), help='a lattice file')
