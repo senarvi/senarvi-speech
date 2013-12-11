@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Sorts the search results based on perplexity or similar measure calculated
-# by a subprocess on a text. Possibly trains a language model on more and more
-# text, calculating the perplexity on a development set, and writing the
-# statistics to a CSV file.
+# Sorts text segments based on perplexity or similar measure calculated by a
+# subprocess on a text. Possibly trains a language model on more and more text,
+# calculating the perplexity on a development set, and writing the statistics to
+# a CSV file.
 #
 # When the switch --write-scores is given, displays the scores with the pages,
 # so that one can manually select a filtering threshold.
