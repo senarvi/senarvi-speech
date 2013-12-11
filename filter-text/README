@@ -52,6 +52,16 @@ filtered. The text pages should be first ordered in a random permutation,
 because the algorithm is greedy:
 
   shuffle-pages.py input.pages --output=shuffled.pages
+  
+In addition to the text pages, you need to estimate a unigram in-domain language
+model, and extract a random sample of the same amount of non-domain-specific
+text, e.g.
+
+  grep -v '######' input.pages | shuf -n 10000 >sample-nds.txt 
+
+Then you can run the algorithm to extract the identifiers of the selected pages:
+
+  re-min-select.py shuffled.pages sample-nds.txt id-model.1bo >selected.ids
 
 
 [1] A. Sethy, P. G. Georgiou, B. Ramabhadran, and S. Narayanan. 2009. An
