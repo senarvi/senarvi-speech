@@ -37,7 +37,7 @@ class TextFileType(object):
 				raise argparse.ArgumentTypeError(msg)
 
 		try:
-			if string.endswith('gz'):
+			if string.endswith('.gz'):
 				return gzip.open(string, self._mode + 't', encoding='utf-8')
 			return open(string, self._mode + 't', encoding='utf-8')
 		except IOError as e:
@@ -78,7 +78,7 @@ class BinaryFileType(object):
 				raise argparse.ArgumentTypeError(msg)
 
 		try:
-			if string.endswith('gz'):
+			if string.endswith('.gz'):
 				return gzip.open(string, self._mode + 'b')
 			return open(string, self._mode + 'b',)
 		except IOError as e:
