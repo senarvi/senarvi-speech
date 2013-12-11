@@ -37,6 +37,7 @@ def decode_lattice(lattice):
 	proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	output, errors = proc.communicate()
 	output = output.decode('utf-8')
+	output = output.rstrip()
 	errors = errors.decode('utf-8')
 	if proc.returncode:
 		raise Exception(' '.join(command) + " failed with code %s" % proc.returncode)
@@ -46,10 +47,12 @@ def decode_lattice(lattice):
 		# The end node was unreachable.
 		return ""
 
-	result_pos = output.index(' ') + 1
-	result = output[result_pos:]
-	result = result.rstrip()
-	return result
+	try:
+		hypothesis_pos = output.index(' ') + 1
+		return output[hypothesis_pos:]
+	except ValueError:
+		sys.stderr.write('Warning: no space in lattice-tool output ref "%s".\n' % output)
+		return ''
 
 parser = argparse.ArgumentParser()
 parser.add_argument('lattice', type=TextFileType('r'), help='a lattice file')
