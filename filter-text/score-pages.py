@@ -10,7 +10,6 @@
 
 import argparse
 import sys
-import codecs
 import io
 import subprocess
 from pages import *
