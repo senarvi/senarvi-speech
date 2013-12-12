@@ -1,14 +1,16 @@
 TOOLS FOR FILTERING LANGUAGE MODEL TRAINING TEXT
 
-These scripts read text segments, e.g. web pages, in the following format:
+A collection of Python 3 scripts for filtering out irrelevant text from language
+model training data based on e.g. language model perplexity or relative entropy
+minimization. It is assumed that you have already collected and segmented the
+data. The segments are called pages, but they can be for example web pages or
+conversation site messages. These scripts read the pages in the following
+format:
 
 ###### http://domain/page1
 Text from page 1.
 ###### http://domain/page2
 Text from page 2.
-
-They can be used to filter out irrelevant text based on e.g. language model
-perplexity.
 
 
 METHOD 1: SCORING AND APPLYING A FILTERING THERSHOLD
@@ -59,9 +61,11 @@ text, e.g.
 
   grep -v '######' input.pages | shuf -n 10000 >sample-nds.txt 
 
-Then you can run the algorithm to extract the identifiers of the selected pages:
+Then you can run the algorithm to extract the identifiers of the pages to
+select, and use the list of identifiers to filter the original pages: 
 
   re-min-select.py shuffled.pages sample-nds.txt id-model.1bo >selected.ids
+  select-pages.py selected.ids --pages=input.pages --output=filtered.txt
 
 
 [1] A. Sethy, P. G. Georgiou, B. Ramabhadran, and S. Narayanan. 2009. An
