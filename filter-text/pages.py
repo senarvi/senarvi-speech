@@ -79,7 +79,7 @@ def write_all_content(input_file, output_file):
 
 # Writes either matching page content (include_match = True), or every other
 # page content (include_match = False).
-def write_matching_content(input_file, output_file, match_uri, match_fragments, include_match=True):
+def write_matching_content(input_file, output_file, match_uri, match_fragments=False, include_match=True):
 	match = False
 	for line in input_file:
 		if line.startswith("###### "):
