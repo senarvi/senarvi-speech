@@ -1,17 +1,28 @@
-These scripts read text segments, e.g. web pages, in the following format:
+TOOLS FOR FILTERING LANGUAGE MODEL TRAINING TEXT
+
+A collection of Python 3 scripts for filtering out irrelevant text from language
+model training data based on e.g. language model perplexity or relative entropy
+minimization. It is assumed that you have already collected and segmented the
+data. The segments are called pages, but they can be for example web pages or
+conversation site messages. These scripts read the pages in the following
+format:
 
 ###### http://domain/page1
 Text from page 1.
 ###### http://domain/page2
 Text from page 2.
 
-They can be used to score the text pages based on e.g. language model
-perplexity, and filter out pages with score above or below a certain
-threshold. They support splitting tasks for multiple parallel jobs.
 
+METHOD 1: SCORING AND APPLYING A FILTERING THERSHOLD
+
+The most straightforward approach to perform filtering is to first score each
+text page and then filter out pages with score above or below a certain
+threshold. An advantage of this is that tasks can be split for multiple parallel
+jobs.
+ 
 For example, one might score text pages in input.pages using the
-compute-perplexity.sh script, that reads text from standard input, and
-writes the perplexity to standard output:
+compute-perplexity.sh script, that reads text from standard input, and writes
+the perplexity to standard output:
 
   score-pages.py --unit=each --scores=perplexity.scores compute-perplexity.sh input.pages
 
@@ -33,6 +44,34 @@ Say the minimum perplexity is obtained at score 65. This can be used
 as the filtering threshold:
 
   filter-pages.py --max-score=65 --pages=input.pages --output=filtered.txt perplexity.scores
+
+
+METHOD 2: RELATIVE ENTROPY MINIMIZATION
+
+The algorithm described in [1] is iterative in nature, so it cannot be
+implemented using a similar scheme where the pages are first scored and then
+filtered. The text pages should be first ordered in a random permutation,
+because the algorithm is greedy:
+
+  shuffle-pages.py input.pages --output=shuffled.pages
+  
+In addition to the text pages, you need to estimate a unigram in-domain language
+model, and extract a random sample of the same amount of non-domain-specific
+text, e.g.
+
+  grep -v '######' input.pages | shuf -n 10000 >sample-nds.txt 
+
+Then you can run the algorithm to extract the identifiers of the pages to
+select, and use the list of identifiers to filter the original pages: 
+
+  re-min-select.py shuffled.pages sample-nds.txt id-model.1bo >selected.ids
+  select-pages.py selected.ids --pages=input.pages --output=filtered.txt
+
+
+[1] A. Sethy, P. G. Georgiou, B. Ramabhadran, and S. Narayanan. 2009. An
+Iterative Relative Entropy Minimization-Based Data Selection Approach for n-Gram
+Model Adaptation. Trans. Audio, Speech and Lang. Proc. 17, 1 (January 2009),
+13-23.
 
 Author: Seppo Enarvi
 http://users.marjaniemi.com/seppo/

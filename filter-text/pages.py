@@ -31,7 +31,40 @@ class Page:
 	def add_content(self, x):
 		self.__content += x
 
-# Reads all the pages for given batch.
+
+class DiskPage:
+	def __init__(self, uri=None):
+		self.__uri = uri
+		self.__pointers = list()
+	
+	def empty(self):
+		if self.__uri is None:
+			return True
+		if not self.__pointers:
+			return True
+		return False
+	
+	def uri(self):
+		return self.__uri
+	
+	def header(self):
+		return '###### ' + self.__uri + '\n'
+
+	def content(self):
+		result = ''
+		for file, start_offset, length in self.__pointers:
+			file.seek(start_offset)
+			result += file.read(length)
+		return result
+
+	def pointers(self):
+		return self.__pointers
+	
+	def add_pages(self, x):
+		self.__pointers.extend(x)
+	
+
+# Reads all the pages from a file.
 def read_pages(file, fragments=True):
 	page = Page()
 	for line in file:
@@ -47,6 +80,35 @@ def read_pages(file, fragments=True):
 		else:
 			page.add_content(line)
 	if not page.empty():
+		yield page
+
+# Returns pointers to all the pages in a file.
+def read_page_pointers(file, fragments=True):
+	page = None
+	start_offset = 0
+	length = 0
+
+	# "for line in file" loop doesn't allow file.tell().
+	while True:
+		line = file.readline()
+		if not line: break
+
+		if line.startswith('###### '):
+			if (page is not None) and (length > 0):
+				page.add_pages([(file, start_offset, length)])
+				yield page
+			uri = line[7:].rstrip()
+			if not fragments:
+				end = uri.find('#')
+				if end != -1:
+					uri = uri[:end]
+			page = DiskPage(uri)
+			start_offset = file.tell()
+			length = 0
+		else:
+			length += len(line)
+	if (page is not None) and (length > 0):
+		page.add_pages([(file, start_offset, length)])
 		yield page
 
 # Reads all the scores into a dictionary.
@@ -79,7 +141,7 @@ def write_all_content(input_file, output_file):
 
 # Writes either matching page content (include_match = True), or every other
 # page content (include_match = False).
-def write_matching_content(input_file, output_file, match_uri, match_fragments, include_match=True):
+def write_matching_content(input_file, output_file, match_uri, match_fragments=False, include_match=True):
 	match = False
 	for line in input_file:
 		if line.startswith("###### "):
