@@ -50,4 +50,5 @@ while len(ordered_uris) > 0:
 		args.output.flush()
 	else:
 		for input_file in args.input:
+			input_file.seek(0)
 			write_matching_content(input_file, args.output, uri)
