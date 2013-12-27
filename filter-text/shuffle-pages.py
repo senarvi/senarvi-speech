@@ -21,14 +21,13 @@ args = parser.parse_args()
 uris = set()
 pages = dict()
 for input_file in args.input:
-	for page in read_pages(input_file):
+	for page in read_page_pointers(input_file):
 		uri = page.uri()
 		uris.add(uri)
-		if args.in_memory:
-			if uri in pages:
-				pages[uri].add_content(page.content())
-			else:
-				pages[uri] = page
+		if uri in pages:
+			pages[uri].add_pages(page.pointers())
+		else:
+			pages[uri] = page
 
 num_pages = len(uris)
 sys.stderr.write("%i pages in the input files.\n" % num_pages)
@@ -44,11 +43,7 @@ while len(ordered_uris) > 0:
 	if progress > previous_progress:
 		sys.stderr.write("%i %% done.\n" % progress)
 		previous_progress = progress
-	if args.in_memory:
-		args.output.write(pages[uri].header())
-		args.output.write(pages[uri].content())
-		args.output.flush()
-	else:
-		for input_file in args.input:
-			input_file.seek(0)
-			write_matching_content(input_file, args.output, uri)
+
+	args.output.write(pages[uri].header())
+	args.output.write(pages[uri].content())
+	args.output.flush()
