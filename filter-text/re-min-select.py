@@ -9,7 +9,7 @@
 # the same size as the data that was used to estimate the in-domain language
 # model.
 #
-# Writes the identifires of the selected text segments to standard output. 
+# Writes the identifiers of the selected text segments to standard output. 
 #
 # Author: Seppo Enarvi
 # http://users.marjaniemi.com/seppo/
