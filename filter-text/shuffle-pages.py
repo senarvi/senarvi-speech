@@ -15,7 +15,6 @@ from filetypes import TextFileType
 parser = argparse.ArgumentParser()
 parser.add_argument('input', type=TextFileType('r'), nargs='+', help='input text page files')
 parser.add_argument('--output', type=TextFileType('w'), default='-', help='output file for reordered text pages')
-parser.add_argument('--in-memory', action='store_true', default=False, help='load the entire data set into memory')
 args = parser.parse_args()
 
 uris = set()
