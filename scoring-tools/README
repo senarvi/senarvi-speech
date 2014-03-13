@@ -1,0 +1,18 @@
+TOOLS FOR SCORING LANGUAGE MODELS
+
+The tool best-path-ppl.py can be used to compute the perplexity of a language
+model on a .trn transcript file in the presence of transcript alternations.
+The language model probability is taken as the maximum over the different
+paths through the transcript. If there are many alternations in the
+transcripts, computation becomes slow without limiting the maximum number of
+paths that are kept in memory at a time. The program can be run in the
+following way:
+
+  best-path-ppl.py LM-FILE TRN-FILE --max-alternatives=512
+
+For the transcript file format, see:
+http://www1.icsi.berkeley.edu/Speech/docs/sctk-1.2/infmts.htm#trn_fmt_name_0
+
+
+Author: Seppo Enarvi
+http://users.marjaniemi.com/seppo/

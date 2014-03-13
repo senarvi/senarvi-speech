@@ -135,6 +135,7 @@ class ArpaLM(object):
 		spam = fh.readline().rstrip()
 		if spam != "\\1-grams:":
 			raise Exception("1-grams marker not found")
+		print("Reading %i 1-grams." % self.ng_counts[1])
 		# ID to word mapping
 		self.widmap = []
 		wordid = 0
@@ -169,6 +170,7 @@ class ArpaLM(object):
 			if m != None:
 				n = int(m.group(1))
 				ngramid = 0
+				print("Reading %i %i-grams." % (self.ng_counts[n], n))
 			else:
 				spam = spam.split()
 				p = float(spam[0]) * LOG10TOLOG
