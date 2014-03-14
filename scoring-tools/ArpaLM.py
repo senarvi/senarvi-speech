@@ -58,6 +58,7 @@ import os
   
 LOG10TOLOG = numpy.log(10)
 LOGTOLOG10 = 1./LOG10TOLOG
+LOG0STR = '-99'
 
 class ArpaLM(object):
 	"Class for reading ARPA-format language models"
@@ -98,6 +99,12 @@ class ArpaLM(object):
 		self.log_wip = numpy.log(wip)
 
 
+	def __convert_inprob(self, x):
+		if x == LOG0STR:
+			return float("-inf")
+		else:
+			return float(x) * LOG10TOLOG
+
 	def read(self, fh):
 		"""
 		Load an ARPA format language model from a file in its entirety.
@@ -124,7 +131,9 @@ class ArpaLM(object):
 				self.ng_counts[n] = c
 		# Word and N-Gram to ID mapping
 		self.ngmap = []
-		# Create probability/backoff arrays
+		# Create probability/backoff arrays:
+		# ngrams: n matrices of [number of n-grams] times 2 elements
+		# ngmap: n dicts
 		self.n = max(self.ng_counts.keys())
 		self.ngrams = []
 		for n in range(1,self.n+1):
@@ -143,16 +152,16 @@ class ArpaLM(object):
 			spam = fh.readline().rstrip()
 			if spam == "":
 				break
-			#print spam
 			try:
 				p,w,b = spam.split()
+				b = self.__convert_inprob(b)
 			except ValueError:	#hack - if backoff not present is 0.0
 				p,w = spam.split()
 				b = 0
+			p = self.__convert_inprob(p)
 			self.ngmap[0][w] = wordid
 			self.widmap.append(w)
-			self.ngrams[0][wordid,:] = (float(p) * LOG10TOLOG,
-										float(b) * LOG10TOLOG)
+			self.ngrams[0][wordid,:] = p, b
 			wordid = wordid + 1
 
 		# Read N-grams
@@ -164,19 +173,23 @@ class ArpaLM(object):
 			spam = fh.readline().rstrip()
 			if spam == "":
 				continue
-			if spam == "\\end\\":
-				break
-			m = r.match(spam)
+			# Speed improvement: Only match regular expression if
+			# the first character is a backslash.
+			m = None
+			if spam[0] == "\\":
+				if spam == "\\end\\":
+					break
+				m = r.match(spam)
 			if m != None:
 				n = int(m.group(1))
 				ngramid = 0
 				print("Reading %i %i-grams." % (self.ng_counts[n], n))
 			else:
 				spam = spam.split()
-				p = float(spam[0]) * LOG10TOLOG
+				p = self.__convert_inprob(spam[0])
 				if len(spam) == n + 2:
 					ng = tuple(spam[1:-1])
-					b = float(spam[-1]) * LOG10TOLOG
+					b = self.__convert_inprob(spam[-1])
 				elif len(spam) == n + 1:
 					ng = tuple(spam[1:])
 					b = 0.0
@@ -188,10 +201,8 @@ class ArpaLM(object):
 
 				# Successor list for N-1-Gram
 				mgram = tuple(ng[:-1])
-				if mgram not in self.succmap:
-					self.succmap[mgram] = []
-				self.succmap[mgram].append(ng[-1])
-				ngramid = ngramid + 1
+				self.succmap.setdefault(mgram, []).append(ng[-1])
+				ngramid += 1
 
 	def get_size(self):
 		"""
@@ -320,12 +331,9 @@ class ArpaLM(object):
 				 words given, in base e (natural log).
 		@rtype: float
 		"""
-		#print syms
 		syms = syms[0:min(len(syms),self.n)]
 		# It makes the most sense to do this recursively
 		n = len(syms)
-		#print syms
-		#print n
 		if n == 1:
 			if syms[0] in self.ngmap[0]:
 				# 1-Gram exists, just return its probability

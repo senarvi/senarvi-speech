@@ -38,7 +38,10 @@ class Path:
 
 	def append(self, word, lm):
 		self.__history.append(word)
-		self.__logprob += lm.prob(*reversed(self.history()))
+		word_logprob = lm.prob(*reversed(self.history()))
+		if word_logprob == float('-inf'):
+			raise ArpaLM.OOVError(word)
+		self.__logprob += word_logprob
 
 class AlternativePaths:
 	def __init__(self, lm):
