@@ -118,6 +118,8 @@ num_words = 0
 num_rejected_sentences = 0
 for utterance_id, transcript in trn:
 	alternatives = AlternativePaths(lm)
+	if (len(transcript) >= 2) and (transcript[0] == '<s>') and (transcript[-1] == '</s>'):
+		transcript = transcript[1:-1]
 	for token in transcript:
 		if type(token) is list:
 			alternatives.extend(token)
