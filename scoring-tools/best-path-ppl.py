@@ -131,10 +131,24 @@ for utterance_id, transcript in trn:
 
 	best_alternative = alternatives.best()
 	if best_alternative is not None:
-		# Don't count the <s> as a word.
-		num_words += len(best_alternative.history()) - 1
+		# When using subword models, the transcripts always contain a word boundary
+		# after the initial <s> and before the final </s>. There may be two
+		# consecutive word boundaries, at least if the transcript is empty. We
+		# remove first consecutive word boundary symbols.
+		hist = best_alternative.history()
+		hist = [x for i, x in enumerate(hist) if hist[i:i+2] != ['<w>', '<w>']]
+
+		# Now the number of word boundaries equals to the number of words, omitting
+		# the initial sentence start, or in case of a word model, the number of
+		# tokens minus one.
+		num_word_boundaries = hist.count('<w>')
+		if num_word_boundaries >= 1:
+			num_words += num_word_boundaries
+		else:
+			num_words += len(hist) - 1
+
 		logprob_sum += best_alternative.logprob()
-		print(str(best_alternative) + ' (' + str(utterance_id) + ')')
+		print(best_alternative, '(' + str(utterance_id) + ')')
 	else:
 		num_rejected_sentences += 1
 
