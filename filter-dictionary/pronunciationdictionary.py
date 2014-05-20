@@ -40,11 +40,14 @@ class PronunciationDictionary:
 		
 		def __getitem__(self, index):
 			return self.pronunciations[index]
-		
+
+		# Returns a dictionary entry as a byte string, word (name)
+		# encoded in UTF-8 and pronunciation encoded in ISO-8859-1.
 		def dictionary_entry(self):
 			result = bytes()
 			for pronunciation in self:
-				result += (self.name + "(" + str(pronunciation.prob) + ") ").encode('utf-8')
+				word = self.name + "(" + str(pronunciation.prob) + ") "
+				result += word.encode('utf-8')
 				result += str(pronunciation).encode('iso-8859-1')
 				result += "\n".encode('utf-8')
 			return result
@@ -100,11 +103,13 @@ class PronunciationDictionary:
 			return self.words[name][pronunciation_id]
 		else:
 			return self.words[name]
-	
+
+	# Reads a dictionary from a file opened in binary mode.	
 	def read(self, input_file):
-		dictionary_re = re.compile(r'^(\S+)\(([\d\.e\-]+)\)$')
+		word_re = re.compile(r'^(\S+)\(([\d\.e\-]+)\)$')
 		
 		for line in input_file:
+			# Decode phones as ISO-8859-1 and the rest of the line as UTF-8.
 			space_pos = line.find(int(0x20))
 			if space_pos > 0:
 				phones = line[space_pos:].decode('iso-8859-1').rstrip().split()
@@ -113,7 +118,7 @@ class PronunciationDictionary:
 				space_pos = len(line)
 
 			word = line[:space_pos].decode('utf-8')
-			match = dictionary_re.search(word)
+			match = word_re.search(word)
 			if match is None:
 				sys.stderr.write("Could not parse dictionary at word '" + word + "'.\n")
 				sys.exit(1)
