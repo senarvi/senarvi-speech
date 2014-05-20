@@ -17,32 +17,36 @@ parser.add_argument('input', type=TextFileType('r'), nargs='+', help='input text
 parser.add_argument('--output', type=TextFileType('w'), default='-', help='output file for reordered text pages')
 args = parser.parse_args()
 
-uris = set()
 pages = dict()
 for input_file in args.input:
+	sys.stderr.write("Reading input file %s.\n" % input_file.name)
+	sys.stderr.flush()
 	for page in read_page_pointers(input_file):
 		uri = page.uri()
-		uris.add(uri)
 		if uri in pages:
 			pages[uri].add_pages(page.pointers())
 		else:
 			pages[uri] = page
 
-num_pages = len(uris)
+num_pages = len(pages)
 sys.stderr.write("%i pages in the input files.\n" % num_pages)
+sys.stderr.flush()
 
-ordered_uris = list(uris)
+ordered_pages = list(pages.values())
+random.shuffle(ordered_pages)
+sys.stderr.write("Random permutation generated.\n")
+sys.stderr.flush()
 
 previous_progress = -1
-while len(ordered_uris) > 0:
-	index = random.randint(0, len(ordered_uris) - 1)
-	uri = ordered_uris[index]
-	del ordered_uris[index]
-	progress = int((num_pages - len(ordered_uris)) * 100 / num_pages)
+num_written_pages = 0
+for page in ordered_pages:
+	args.output.write(page.header())
+	args.output.write(page.content())
+	args.output.flush()
+
+	num_written_pages += 1
+	progress = int(num_written_pages * 100 / num_pages)
 	if progress > previous_progress:
 		sys.stderr.write("%i %% done.\n" % progress)
+		sys.stderr.flush()
 		previous_progress = progress
-
-	args.output.write(pages[uri].header())
-	args.output.write(pages[uri].content())
-	args.output.flush()
