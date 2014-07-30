@@ -155,7 +155,7 @@ def divergence_increment(selected_counts, page_counts, id_model, alpha):
 	
 	return result
 
-def select_text(pages_file, selected_counts, id_model, alpha, limit=None):
+def select_text(pages_file, selected_counts, id_model, alpha, max_div_inc, limit=None):
 	div = divergence(selected_counts, id_model, alpha)
 	sys.stderr.write('divergence: %f\n' % div)
 	if limit is not None:
@@ -168,7 +168,7 @@ def select_text(pages_file, selected_counts, id_model, alpha, limit=None):
 	for page in read_pages(pages_file):
 		page_counts = word_counts(page.content())
 		div_inc = divergence_increment(selected_counts, page_counts, id_model, alpha)
-		if div_inc < 0:
+		if div_inc < max_div_inc:
 			div += div_inc
 			
 			for word in page_counts:
@@ -182,6 +182,7 @@ def select_text(pages_file, selected_counts, id_model, alpha, limit=None):
 			
 			if message_count < result_length / 100000:
 				sys.stderr.write('%i words selected, divergence: %f\n' % (result_length, div))
+				sys.stderr.flush()
 				message_count += 1
 			
 			if limit is not None:
@@ -200,6 +201,7 @@ parser.add_argument('pages', type=TextFileType('r'), help='input text pages')
 parser.add_argument('ndssample', type=TextFileType('r'), help='a random sample from the non-domain-specific data')
 parser.add_argument('idmodel', type=TextFileType('r'), help='unigram in-domain language model')
 parser.add_argument('--alpha', type=float, default=1, help='the skew divergence parameter denoting the smoothing influence')
+parser.add_argument('--max-div-inc', type=float, default=0, help='maximum divergence increment for page to be selected')
 args = parser.parse_args()
 
 # Read in-domain unigram model.
@@ -213,11 +215,11 @@ selected_counts = word_counts(args.ndssample.read(), vocabulary)
 args.ndssample.close()
 
 # Collect the same amount of data there is in the random sample.
-selected_text = select_text(args.pages, selected_counts, id_model, args.alpha, sum(selected_counts.values()))
+selected_text = select_text(args.pages, selected_counts, id_model, args.alpha, args.max_div_inc, sum(selected_counts.values()))
 
 # Recompute the counts from the selected text.
 sys.stderr.write('Recomputing counts from selected data.\n')
 selected_counts = word_counts(selected_text, vocabulary)
 
 # Filter the rest of the data.
-select_text(args.pages, selected_counts, id_model, args.alpha)
+select_text(args.pages, selected_counts, id_model, args.alpha, args.max_div_inc)
