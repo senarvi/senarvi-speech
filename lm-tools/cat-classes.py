@@ -6,7 +6,6 @@
 
 import argparse
 import sys
-import codecs
 from filetypes import TextFileType
 
 class Names:
