@@ -15,9 +15,6 @@ parser.add_argument('classes', type=TextFileType('r'), help='input class definit
 parser.add_argument('counts', type=TextFileType('r'), help='n-gram counts file')
 args = parser.parse_args()
 
-parser = OptionParser()
-(options, args) = parser.parse_args()
-
 classes = WordClasses()
 classes.read(args.classes)
 
