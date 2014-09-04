@@ -65,15 +65,6 @@ class EditPartitioning:
 			return result
 
 
-	class Context:
-		def __init__(self, left, center, right, more_left, more_right):
-			self.left = left
-			self.center = center
-			self.right = right
-			self.more_left = more_left
-			self.more_right = more_right
-
-
 	# Creates a 2D matrix of zeros.
 	@staticmethod
 	def __zero_matrix(width, height):
@@ -172,19 +163,8 @@ class EditPartitioning:
 		self.partitions = new_partitions
 
 	def __iter__(self):
-		if len(self.partitions) == 0:
+		if len(self.partitions) < 2:
 			return
-
-		if len(self.partitions) == 1:
-			center = self.partitions[0]
-			if center.is_change():
-				yield EditPartitioning.Context(None, center, None, False, False)
-			return
-
-		center = self.partitions[0]
-		right = self.partitions[1]
-		if center.is_change():
-			yield EditPartitioning.Context(None, center, right, False, len(self.partitions) > 2)
 
 		for i in range(1, len(self.partitions) - 1):
 			left = self.partitions[i - 1]
@@ -203,3 +183,4 @@ class EditPartitioning:
 		for partition in self.partitions:
 			result += str(partition) + " "
 		return result
+
