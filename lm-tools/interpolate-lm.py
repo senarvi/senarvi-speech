@@ -50,7 +50,7 @@ if args.tuning_text is not None:
 		sys.exit(1)
 	lambdas = matches.group(1).split(' ')
 else:
-	lambdas = [equal_lambda] * num_components
+	lambdas = [str(equal_lambda)] * num_components
 
 command = [args.ngram_cmd,
 		'-order', str(args.order),
