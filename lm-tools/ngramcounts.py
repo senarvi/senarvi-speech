@@ -4,7 +4,6 @@
 # A Python class that stores n-gram counts.
 
 import sys
-import mmap
 
 class NGramCounts:
 	def __init__(self):
@@ -18,8 +17,7 @@ class NGramCounts:
 	
 	def read(self, input_file, max_order=None, min_count=None):
 		lines_read = 0
-		mm = mmap.mmap(input_file.fileno(), 0, prot=mmap.PROT_READ)
-		for line in iter(mm.readline, ""):
+		for line in input_file:
 			lines_read += 1
 			if lines_read % 10000000 == 0:
 				print(lines_read, "lines read.", file=sys.stderr)
