@@ -27,7 +27,7 @@ class WordClasses:
 		
 		def set_probability(self, word, prob):
 			if not word in self.__probs:
-				raise ValueError("WordClasses.set_probability: No word " + word.encode('utf-8') + " in class " + self.__name.encode('utf-8') + ".")
+				raise ValueError("WordClasses.set_probability: No word " + word + " in class " + self.__name + ".")
 			self.__probs[word] = prob
 		
 		def normalize(self):
@@ -37,11 +37,11 @@ class WordClasses:
 		
 		def write(self, output_file):
 			for word, prob in self.__probs.items():
-				output_file.write(self.__name.encode('utf-8'))
+				output_file.write(self.__name)
 				output_file.write(' ')
 				output_file.write(str(prob))
 				output_file.write(' ')
-				output_file.write(word.encode('utf-8'))
+				output_file.write(word)
 				output_file.write('\n')
 	
 	def __init__(self):
