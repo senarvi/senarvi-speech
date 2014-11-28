@@ -81,6 +81,7 @@ for page in read_pages(args.pages):
 		continue
 	uri = page.uri()
 	page_counts, page_total = add_unigram_counts(page.content(), dict(), vocabulary)
+	sub_total = nds_total - page_total
 	logprob = 0
 	for word in vocabulary:
 		sub_count = nds_counts[word]
@@ -90,7 +91,6 @@ for page in read_pages(args.pages):
 			logprob = -sys.float_info.max
 			break
 		else:
-			sub_total = nds_total - page_total
 			id_count = id_counts[word]
 			try:
 				logprob += math.log(float(sub_count) / sub_total) * id_count
