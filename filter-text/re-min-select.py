@@ -125,7 +125,6 @@ def divergence_increment(selected_counts, page_counts, id_model, alpha):
 	new_total_logcount = math.log(new_total_count)
 
 	result = math.log(new_total_count / selected_total_count)
-	logresult = math.log(new_total_count / selected_total_count)
 	
 	oov_words = 0
 	for word in page_counts.keys():
@@ -209,8 +208,8 @@ id_model = read_unigram_lm(args.idmodel)
 args.idmodel.close()
 vocabulary = id_model.keys()
 
-# Initialize counts from a random sample of non-domain-specific text. Add one to
-# all the counts.
+# First initialize the counts of all words in ID model to 1.
+# Then add the counts from a random sample of non-domain-specific text.
 selected_counts = word_counts(args.ndssample.read(), vocabulary)
 args.ndssample.close()
 
