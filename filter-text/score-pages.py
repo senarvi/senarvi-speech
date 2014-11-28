@@ -15,6 +15,23 @@ import subprocess
 from pages import *
 from filetypes import TextFileType
 
+
+def write_error(return_code, score_str, stdout, stderr):
+	if stdout == '':
+		stdout = score_str
+	else:
+		stdout = score_str + '\n' + stdout
+
+	sys.stderr.write("Return code: %d\n" % return_code)
+	if stdout != '':
+		sys.stderr.write("Standard output:\n")
+		sys.stderr.write("%s\n" % stdout)
+	if stderr != '':
+		sys.stderr.write("Standard error:\n")
+		sys.stderr.write("%s\n" % stderr)
+	sys.stderr.write(score_str)
+
+
 parser = argparse.ArgumentParser()
 parser.add_argument('command', type=str, help='a command that scores text')
 parser.add_argument('input', type=TextFileType('r'), nargs='+', help='input text page files')
@@ -88,7 +105,7 @@ else:
 			sys.stderr.write("Batch %i/%i: %i %% done.\n" % (args.batch_index, args.num_batches, progress))
 			previous_progress = progress
 		sys.stderr.flush()
-		process = subprocess.Popen([args.command], stdin=subprocess.PIPE, stdout=subprocess.PIPE);
+		process = subprocess.Popen([args.command], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE);
 		output_file = io.TextIOWrapper(process.stdin, 'utf-8')
 		if args.in_memory:
 			if include_match:
@@ -102,11 +119,20 @@ else:
 				write_matching_content(input_file, output_file, uri, args.merge_fragments, include_match)
 		output_file.close()
 		process.stdin.close()
-		score_str = process.stdout.readline()
+		score_str = process.stdout.readline().decode('utf-8').rstrip()
+		stdout = process.stdout.read().decode('utf-8').rstrip()
+		stderr = process.stderr.read().decode('utf-8').rstrip()
+		process.wait()
+		return_code = process.returncode
+		if (score_str == '') or (return_code != 0) or (stdout != '') or (stderr != ''):
+			sys.stderr.write("Scoring script failed on page %s.\n" % uri)
+			write_error(return_code, score_str, stdout, stderr)
+			sys.exit(4)
 		try:
 			score = float(score_str)
 		except ValueError:
-			sys.stderr.write("Invalid score '%s' for page %s.\n" % (score_str, uri))
+			sys.stderr.write("Scoring script returned an invalid score for page %s.\n" % uri)
+			write_error(return_code, score_str, stdout, stderr)
 			sys.exit(3)
 		scores_file.write("###### %s\n%f\n" % (uri, score))
 		scores_file.flush()
