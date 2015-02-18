@@ -27,6 +27,9 @@ class TextFileType(object):
 		self._mode = mode
 
 	def __call__(self, string):
+		if string is None:
+			return None
+
 		if string == '-':
 			if 'r' in self._mode:
 				return io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')
@@ -68,6 +71,9 @@ class BinaryFileType(object):
 		self._mode = mode
 
 	def __call__(self, string):
+		if string is None:
+			return None
+
 		if string == '-':
 			if 'r' in self._mode:
 				return sys.stdin.buffer
