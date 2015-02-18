@@ -14,7 +14,7 @@ from filetypes import TextFileType
 parser = argparse.ArgumentParser()
 parser.add_argument('input', type=str, nargs='+', help='two or more input models')
 parser.add_argument('--output', type=str, default='-', help='output model path (default is stdout)')
-parser.add_argument('--write-weights', type=str, default=None, help='write the optimized weights to this file, separated by space')
+parser.add_argument('--write-weights', type=TextFileType('w'), default=None, help='write the optimized weights to this file, one per line')
 parser.add_argument('--order', type=int, default=3, help='output n-gram model order (default is 3)')
 parser.add_argument('--opt-perp', type=str, dest='tuning_text', default=None, help='a development text for tuning interpolation weights')
 parser.add_argument('--ngram-cmd', type=str, default='ngram', help='SRILM ngram executable (default is "ngram")')
@@ -54,7 +54,8 @@ if args.tuning_text is not None:
 else:
 	lambdas = [str(equal_lambda)] * num_components
 
-if args.write_weights:
+if args.write_weights is not None:
+	args.write_weights.write('\n'.join(lambdas) + '\n')
 
 command = [args.ngram_cmd,
 		'-order', str(args.order),
