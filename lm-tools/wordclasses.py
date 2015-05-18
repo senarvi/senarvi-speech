@@ -57,11 +57,18 @@ class WordClasses:
 			fields = line.split()
 			if len(fields) == 0:
 				continue
-			if len(fields) != 3:
+			elif len(fields) == 2:
+				# Assume mkcls / word2vec file format.
+				word = fields[0]
+				name = "CLASS-" + fields[1].zfill(5)
+				prob = 0
+			elif len(fields) == 3:
+				# Assume SRILM file format.
+				name = fields[0]
+				prob = float(fields[1])
+				word = fields[2]
+			else:
 				raise Exception("Invalid word class definition: " + line)
-			name = fields[0]
-			prob = float(fields[1])
-			word = fields[2]
 			if not name in self.__classes:
 				self.__classes[name] = self.WordClass(name)
 			self.__classes[name].add(word, prob)
