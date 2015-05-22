@@ -31,7 +31,11 @@ class WordClasses:
 			self.__probs[word] = prob
 		
 		def normalize(self):
-			factor = 1 / sum(self.__probs.values())
+			total_prob = sum(self.__probs.values())
+			if total_prob > 0:
+				factor = 1 / total_prob
+			else:
+				factor = 0
 			for word, prob in self.__probs.items():
 				self.__probs[word] = prob * factor
 		
