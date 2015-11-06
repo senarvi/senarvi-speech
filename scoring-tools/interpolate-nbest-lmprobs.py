@@ -35,7 +35,7 @@ parser.add_argument(
     '--scale2', metavar='SCALE', type=float, default=1.0,
     help='scale new LM probabilities by this factor')
 parser.add_argument(
-    '--lambda', metavar='LAMBDA', type=float, default=0.5,
+    '--lambda', metavar='LAMBDA', dest='lambda2', type=float, default=0.5,
     help='interpolation weight to apply to the new probabilities')
 parser.add_argument(
     '--precision', metavar='PREC', type=int, default=10,
@@ -46,15 +46,16 @@ getcontext().prec = 6
 
 scale1 = Decimal(args.scale1)
 scale2 = Decimal(args.scale2)
-lambda2 = Decimal(args.lambda)
+lambda2 = Decimal(args.lambda2)
 lambda1 = Decimal(1) - lambda2
 
 for nbest_line, newscores_line in zip(args.nbestlist, args.newscores):
     fields = nbest_line.split()
-    ascore = float(fields[0])
-    lscore1 = Decimal(fields[1])
-    nwords = int(fields[2])
-    words = fields[3:]
+    id = fields[0]
+    ascore = float(fields[1])
+    lscore1 = Decimal(fields[2])
+    nwords = int(fields[3])
+    words = fields[4:]
     if nwords != len(words):
         sys.stderr.write(
             "Warning: nwords field does not match the number of words in "
@@ -76,4 +77,4 @@ for nbest_line, newscores_line in zip(args.nbestlist, args.newscores):
     sys.stdout.write(str(ascore) + " ")
     sys.stdout.write(str(lscore) + " ")
     sys.stdout.write(str(nwords) + " ")
-    sys.stdout.write(" ".join(words))
+    sys.stdout.write(" ".join(words) + "\n")
