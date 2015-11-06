@@ -37,9 +37,6 @@ parser.add_argument(
 parser.add_argument(
     '--lambda', metavar='LAMBDA', dest='lambda2', type=float, default=0.5,
     help='interpolation weight to apply to the new probabilities')
-parser.add_argument(
-    '--precision', metavar='PREC', type=int, default=10,
-    help='number of decimals of floating point precision')
 args = parser.parse_args()
 
 getcontext().prec = 6
@@ -74,6 +71,7 @@ for nbest_line, newscores_line in zip(args.nbestlist, args.newscores):
     lprob = lprob1 + lprob2
     lscore = lprob.log10()
 
+    sys.stdout.write(id + " ")
     sys.stdout.write(str(ascore) + " ")
     sys.stdout.write(str(lscore) + " ")
     sys.stdout.write(str(nwords) + " ")
