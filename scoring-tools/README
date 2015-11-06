@@ -1,4 +1,10 @@
-TOOLS FOR SCORING LANGUAGE MODELS
+# TOOLS FOR SCORING LANGUAGE MODELS
+
+Author: Seppo Enarvi
+http://users.marjaniemi.com/seppo/
+
+
+## best-path-ppl.py
 
 The tool best-path-ppl.py can be used to compute the perplexity of a language
 model on a .trn transcript file in the presence of transcript alternations.
@@ -10,9 +16,26 @@ following way:
 
   best-path-ppl.py LM-FILE TRN-FILE --max-alternatives=512
 
-For the transcript file format, see:
+
+## interpolate-nbest-lmprobs.py
+
+Interpolates LM probabilities in n-best list with new LM probabilities.
+
+Takes as input an n-best list, which is in SRILM format, except that an
+additional first column contains the utterance ID. The new LM probabilities
+are read from another file that contains one log probability per line. Writes
+a new n-best list to standard output, in the same format, with the LM scores
+interpolated using the following formula:
+
+  log(exp(score1 * scale1) * (1-lambda) + exp(score2 * scale2) * lambda))
+
+All the log probabilities are base 10.
+
+
+## File Formats
+
+.trn transcript file format:
 http://www1.icsi.berkeley.edu/Speech/docs/sctk-1.2/infmts.htm#trn_fmt_name_0
 
-
-Author: Seppo Enarvi
-http://users.marjaniemi.com/seppo/
+SRILM n-best file format:
+http://www.speech.sri.com/projects/srilm/manpages/nbest-format.5.html
