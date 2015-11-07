@@ -56,7 +56,7 @@ for nbest_line, newscores_line in zip(args.nbestlist, args.newscores):
     if nwords != len(words):
         sys.stderr.write(
             "Warning: nwords field does not match the number of words in "
-            "n-best list %s.\n" % nbest_filename)
+            "n-best list.\n")
 
     lscore2 = Decimal(newscores_line)
 
