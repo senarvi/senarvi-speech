@@ -16,6 +16,7 @@ parser.add_argument('input', type=str, nargs='+', help='two or more input models
 parser.add_argument('--output', type=str, default='-', help='output model path (default is stdout)')
 parser.add_argument('--write-weights', type=TextFileType('w'), default=None, help='write the optimized weights to this file, one per line')
 parser.add_argument('--order', type=int, default=3, help='output n-gram model order (default is 3)')
+parser.add_argument('--classes', type=str, default=None, help='interpret the language models as class models and read the classes from the given file')
 parser.add_argument('--unk', action='store_true', help='include unknown word token')
 parser.add_argument('--opt-perp', type=str, dest='tuning_text', default=None, help='a development text for tuning interpolation weights')
 parser.add_argument('--ngram-cmd', type=str, default='ngram', help='SRILM ngram executable (default is "ngram")')
@@ -37,6 +38,9 @@ if args.tuning_text is not None:
 		           '-lm', model_path,
 		           '-ppl', args.tuning_text,
 		           '-debug', '2']
+		if not args.classes is None:
+			command.extend(['-classes', args.classes,
+			                '-simple-classes'])
 		if args.unk:
 			command.append('-unk')
 		print(' '.join(command))
@@ -66,6 +70,9 @@ command = [args.ngram_cmd,
 		'-lm', args.input[0],
 		'-lambda', lambdas[0],
 		'-mix-lm', args.input[1]]
+if not args.classes is None:
+	command.extend(['-classes', args.classes,
+	                '-simple-classes'])
 if args.unk:
 	command.append('-unk')
 for i in range(2, num_components):
