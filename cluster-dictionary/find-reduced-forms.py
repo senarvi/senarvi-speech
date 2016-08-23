@@ -87,6 +87,7 @@ for index, con_word in enumerate(con_vocab):
             peers.append(std_word)
     if len(peers) > 0:
         args.output_file.write("{} {}\n".format(con_word, " ".join(peers)))
+        args.output_file.flush()
     print("{} / {} ({} %)".format(index,
                                   len(con_vocab),
                                   index / len(con_vocab) * 100))
